@@ -22,3 +22,19 @@ code {
 .gayathri-font {
     font-family: 'Gayathri';
 }
+
+.blockSelect:hover div > svg:first-child path {
+    fill: #1565d8;
+}
+.blockSelect:hover div > svg:last-child path {
+    fill: white;
+}
+.blockSelect div > svg:last-child path {
+    fill: #1565d8;
+}
+.blockSelect > svg {
+    visibility: hidden;
+}
+.blockSelect:hover > svg {
+    visibility: visible;
+}

@@ -4,13 +4,19 @@ import './App.css'
 function App() {
     const [step, setStep] = useState(0)
     const stepName = ['', 'Personal Info.', 'Residency Info.', 'Bank Verification']
+
+    const apiHost = 'http://localhost:3000' //will change when it get deployed
+    const loginApiEndpointStep1 = `${apiHost}/login/step1`
+    const loginApiEndpointStep2 = `${apiHost}/login/step2`
+    const loginApiEndpointStep3 = `${apiHost}/login/step3`
+
     return (
         <div className='flex h-screen'>
             <div
                 id='textShow'
                 className='relative basis-5/12 h-full flex flex-col items-center justify-center text-white'>
                 <div className='w-3/4 relative text-lg leading-8'>
-                    <div className='gayathri-font'>"</div>
+                    <div className='gayathri-font text-8xl absolute top-[-3rem] left-[-0.5rem]'>"</div>
                     <div>
                         The passage experienced a surge in popularity during the 1960s when Letraset used it on their
                         dry-transfer sheets, and again during the 90s as desktop publishers bundled the text with their
@@ -224,14 +230,17 @@ function App() {
             {step === 0 && (
                 <div id='step1' className='h-full flex-1'>
                     <div className='w-fit ml-auto mr-12 mt-10 text-[#8692A6]'>
-                        Already have an account<a className='ml-2 text-[#1565D8]'>Sign In</a>
+                        Already have an account?
+                        <a className='ml-2 text-[#1565D8] hover:text-blue-400 cursor-pointer ' href='/signup'>
+                            Sign In
+                        </a>
                     </div>
                     <div className='w-1/2 ml-24 mt-20'>
                         <div className='font-extrabold text-xl leading-10'>Join Us!</div>
                         <div className='text-[#8692A6] w-3/4 text-sm'>
                             To begin this journey, tell us what type of account you’d be opening.
                         </div>
-                        <div className='flex items-center gap-6 mt-8 px-6 py-4  border-2 border-[#1565D8] rounded-md shadow-lg drop-shadow'>
+                        <div className='blockSelect flex items-center gap-6 mt-8 px-6 py-4  border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow'>
                             <div className='relative'>
                                 <svg
                                     width='50'
@@ -240,12 +249,14 @@ function App() {
                                     fill='none'
                                     xmlns='http://www.w3.org/2000/svg'>
                                     <path
+                                        className='svgToFill'
                                         d='M25 0L49.7275 17.9656L40.2824 47.0344H9.71758L0.272532 17.9656L25 0Z'
-                                        fill='#1565D8'
+                                        stroke='#1565D8'
+                                        stroke-width='1.4'
                                     />
                                 </svg>
                                 <svg
-                                    className='absolute top-[calc(25px-10px)] left-[calc(24px-9px)]'
+                                    className='absolute top-[calc(25px-10px)] left-[calc(24px-9px)] z-10'
                                     width='20'
                                     height='20'
                                     viewBox='0 0 20 20'
@@ -285,7 +296,7 @@ function App() {
                                 />
                             </svg>
                         </div>
-                        <div className='flex items-center gap-6 mt-8 px-6 py-4  border-2 border-[#1565D8] rounded-md shadow-lg drop-shadow'>
+                        <div className='blockSelect flex items-center gap-6 mt-8 px-6 py-4 border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow'>
                             <div className='relative'>
                                 <svg
                                     width='50'
