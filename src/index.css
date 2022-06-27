@@ -38,3 +38,6 @@ code {
 .blockSelect:hover > svg {
     visibility: visible;
 }
+.back:hover svg path {
+    fill: rgb(87 83 78);
+}

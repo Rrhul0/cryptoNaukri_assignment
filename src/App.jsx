@@ -3,6 +3,8 @@ import './App.css'
 
 function App() {
     const [step, setStep] = useState(0)
+    const [warning, setWarning] = useState(false)
+    const [data, setData] = useState({})
     const stepName = ['', 'Personal Info.', 'Residency Info.', 'Bank Verification']
 
     const apiHost = 'http://localhost:3000' //will change when it get deployed
@@ -10,12 +12,73 @@ function App() {
     const loginApiEndpointStep2 = `${apiHost}/login/step2`
     const loginApiEndpointStep3 = `${apiHost}/login/step3`
 
+    function onClickIndividual(e) {
+        e.preventDefault()
+        setStep(1)
+    }
+
+    function onSubmitPage(e) {
+        e.preventDefault()
+        const stepData = new FormData(e.target)
+        if (step === 1) {
+            const username = stepData.get('username')
+            const email = stepData.get('email')
+            const password = stepData.get('password')
+            //check everything is filled
+            if (!username || !email || !password) {
+                setWarning(true)
+                return
+            }
+            //check for terms
+            if (stepData.get('terms') !== 'on') {
+                //add warning here for accept terms
+                return
+            }
+            setData({
+                username: username,
+                email: email,
+                password: password,
+            })
+        } else if (step === 2) {
+            const phone_number = stepData.get('phone_number')
+            const address = stepData.get('address')
+            const country = stepData.get('country')
+            if (!phone_number || !address || !country) {
+                setWarning(true)
+                return
+            }
+            setData(oldData => {
+                return {
+                    ...oldData,
+                    phone_number: phone_number,
+                    address: address,
+                    country: country,
+                }
+            })
+        } else if (step === 3) {
+            const bvn = stepData.get('bvn')
+            if (!bvn) {
+                setWarning(true)
+                return
+            }
+            setData(oldData => {
+                return { ...oldData, bvn: bvn }
+            })
+        }
+        if (step < 3) setStep(step => step + 1)
+        else return
+    }
+
+    function onClickBack() {
+        setStep(step => step - 1)
+    }
+
     return (
         <div className='flex h-screen'>
             <div
                 id='textShow'
                 className='relative basis-5/12 h-full flex flex-col items-center justify-center text-white'>
-                <div className='w-3/4 relative text-lg leading-8'>
+                <div className='w-3/4 relative text-lg leading-8 mt-6'>
                     <div className='gayathri-font text-8xl absolute top-[-3rem] left-[-0.5rem]'>"</div>
                     <div>
                         The passage experienced a surge in popularity during the 1960s when Letraset used it on their
@@ -210,8 +273,8 @@ function App() {
                     <path
                         d='M50.0879 121.176C16.9599 121.176 -10 94.216 -10 61.0879C-10 27.9599 16.9599 1 50.0879 1C83.216 1 110.176 27.9599 110.176 61.0879C110.176 94.216 83.216 121.176 50.0879 121.176ZM50.0879 23.9401C29.6428 23.9401 12.9401 40.5735 12.9401 61.0879C12.9401 81.6024 29.5735 98.2357 50.0879 98.2357C70.6024 98.2357 87.2357 81.6024 87.2357 61.0879C87.2357 40.5735 70.6024 23.9401 50.0879 23.9401Z'
                         stroke='#E82965'
-                        stroke-width='0.693056'
-                        stroke-miterlimit='10'
+                        strokeWidth='0.693056'
+                        strokeMiterlimit='10'
                     />
                 </svg>
 
@@ -240,7 +303,9 @@ function App() {
                         <div className='text-[#8692A6] w-3/4 text-sm'>
                             To begin this journey, tell us what type of account you’d be opening.
                         </div>
-                        <div className='blockSelect flex items-center gap-6 mt-8 px-6 py-4  border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow'>
+                        <div
+                            className='blockSelect flex items-center gap-6 mt-8 px-6 py-4  border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow cursor-pointer'
+                            onClick={onClickIndividual}>
                             <div className='relative'>
                                 <svg
                                     width='50'
@@ -252,7 +317,7 @@ function App() {
                                         className='svgToFill'
                                         d='M25 0L49.7275 17.9656L40.2824 47.0344H9.71758L0.272532 17.9656L25 0Z'
                                         stroke='#1565D8'
-                                        stroke-width='1.4'
+                                        strokeWidth='1.4'
                                     />
                                 </svg>
                                 <svg
@@ -289,14 +354,14 @@ function App() {
                                 fill='none'
                                 xmlns='http://www.w3.org/2000/svg'>
                                 <path
-                                    fill-rule='evenodd'
-                                    clip-rule='evenodd'
+                                    fillRule='evenodd'
+                                    clipRule='evenodd'
                                     d='M7.5893 0.577414C7.26386 0.251977 6.73622 0.251977 6.41079 0.577414C6.08535 0.90285 6.08535 1.43049 6.41079 1.75592L10.8215 6.16667H1.16671C0.70647 6.16667 0.333374 6.53977 0.333374 7C0.333374 7.46024 0.70647 7.83334 1.16671 7.83334H10.8215L6.41079 12.2441C6.08535 12.5695 6.08535 13.0972 6.41079 13.4226C6.73622 13.748 7.26386 13.748 7.5893 13.4226L13.4226 7.58926C13.7481 7.26382 13.7481 6.73618 13.4226 6.41075L7.5893 0.577414Z'
                                     fill='#1565D8'
                                 />
                             </svg>
                         </div>
-                        <div className='blockSelect flex items-center gap-6 mt-8 px-6 py-4 border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow'>
+                        <div className='blockSelect flex items-center gap-6 mt-8 px-6 py-4 border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow cursor-pointer'>
                             <div className='relative'>
                                 <svg
                                     width='50'
@@ -307,7 +372,7 @@ function App() {
                                     <path
                                         d='M1.09543 18.2329L25 0.865247L48.9046 18.2329L39.7738 46.3344H10.2262L1.09543 18.2329Z'
                                         stroke='#1565D8'
-                                        stroke-width='1.4'
+                                        strokeWidth='1.4'
                                     />
                                 </svg>
                                 <svg
@@ -344,8 +409,8 @@ function App() {
                                 fill='none'
                                 xmlns='http://www.w3.org/2000/svg'>
                                 <path
-                                    fill-rule='evenodd'
-                                    clip-rule='evenodd'
+                                    fillRule='evenodd'
+                                    clipRule='evenodd'
                                     d='M7.5893 0.577414C7.26386 0.251977 6.73622 0.251977 6.41079 0.577414C6.08535 0.90285 6.08535 1.43049 6.41079 1.75592L10.8215 6.16667H1.16671C0.70647 6.16667 0.333374 6.53977 0.333374 7C0.333374 7.46024 0.70647 7.83334 1.16671 7.83334H10.8215L6.41079 12.2441C6.08535 12.5695 6.08535 13.0972 6.41079 13.4226C6.73622 13.748 7.26386 13.748 7.5893 13.4226L13.4226 7.58926C13.7481 7.26382 13.7481 6.73618 13.4226 6.41075L7.5893 0.577414Z'
                                     fill='#1565D8'
                                 />
@@ -357,7 +422,9 @@ function App() {
             {step && (
                 <div className='h-full flex-1'>
                     <div className='flex justify-between items-start mr-12 mt-10 text-[#8692A6] px-14'>
-                        <div className='flex items-center gap-3'>
+                        <div
+                            className='back flex items-center gap-3 hover:text-stone-600 cursor-pointer'
+                            onClick={onClickBack}>
                             <svg
                                 width='8'
                                 height='16'
@@ -366,7 +433,7 @@ function App() {
                                 xmlns='http://www.w3.org/2000/svg'>
                                 <path
                                     d='M9.86251 2.225L8.37918 0.75L0.137512 9L8.38751 17.25L9.86251 15.775L3.08751 9L9.86251 2.225Z'
-                                    fill='#8692A6'
+                                    className='fill-[#8692A6]'
                                 />
                             </svg>
                             Back
@@ -383,7 +450,7 @@ function App() {
                                 <div className='text-[#8692A6] text-sm'>
                                     For the purpose of industry regulation, your details are required.
                                 </div>
-                                <form className='mt-6'>
+                                <form className='mt-6' onSubmit={onSubmitPage}>
                                     <Input
                                         name={'username'}
                                         placeholder='Enter Username'
@@ -452,7 +519,7 @@ function App() {
                             <div className='text-[#8692A6] text-sm'>
                                 For the purpose of industry regulation, your details are required.
                             </div>
-                            <form className='mt-6'>
+                            <form className='mt-6' onSubmit={onSubmitPage}>
                                 {step === 2 && (
                                     <div>
                                         <Input
@@ -516,13 +583,33 @@ function App() {
 function Input({ name, placeholder, type, heading }) {
     return (
         <div>
-            <div className='text-[#696F79] mb-2 mt-3'>{heading}</div>
-            <input
-                placeholder={placeholder}
-                type={type}
-                name={name}
-                className='border border-[#8692A6] rounded-md h-12 w-full pl-4 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
-            />
+            {/* <div className='text-[#696F79] mb-2 mt-3'>{heading}</div> */}
+            <label className='text-[#696F79] relative'>
+                {heading}
+
+                <input
+                    placeholder={placeholder}
+                    required
+                    type={type}
+                    name={name}
+                    className='border border-[#8692A6] rounded-md h-12 w-full pl-4 mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                />
+                {type === 'password' && (
+                    <div
+                        className='absolute -bottom-1 right-3 text-black hover:text-stone-700'
+                        onClick={e => {
+                            if (e.currentTarget.previousSibling.type === 'password') {
+                                e.currentTarget.previousSibling.type = 'text'
+                                e.currentTarget.textContent = 'Hide'
+                            } else {
+                                e.currentTarget.previousSibling.type = 'password'
+                                e.currentTarget.textContent = 'Show'
+                            }
+                        }}>
+                        Show
+                    </div>
+                )}
+            </label>
         </div>
     )
 }
