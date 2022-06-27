@@ -15,7 +15,7 @@ code {
 }
 
 #textShow {
-    background: linear-gradient(0deg, rgba(21, 101, 216, 0.9), rgba(21, 101, 216, 0.9)), url(static/sideshowbg.jpeg);
+    background: linear-gradient(0deg, rgba(21, 101, 216, 0.9), rgba(21, 101, 216, 0.9)), url(/sideshowbg.jpeg);
     background-size: cover;
 }
 
