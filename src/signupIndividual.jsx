@@ -221,7 +221,7 @@ function Input({ name, placeholder, type, heading }) {
                     required
                     type={type}
                     name={name}
-                    className='border border-[#8692A6] rounded-md h-12 w-full pl-4 mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                    className='border border-[#8692A6] rounded-md text-[#494949] h-12 w-full pl-4 mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
                 />
                 {type === 'password' && (
                     <div
@@ -254,11 +254,11 @@ function PhoneNumberInput() {
     }
 
     return (
-        <div className='relative'>
+        <div className='relative text-[#696F79]'>
             <label>
                 Phone number
                 <input
-                    className='border border-[#8692A6] rounded-md h-12 w-full pl-[6.5rem] mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                    className='border border-[#8692A6] text-[#494949] rounded-md h-12 w-full pl-[6.5rem] mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
                     type='text'
                     name='phone_number'
                     // value={value}
@@ -268,7 +268,7 @@ function PhoneNumberInput() {
                 />
             </label>
             <div
-                className='absolute top-[39%] left-0 w-fit z-20'
+                className='absolute top-[39%] left-0 w-fit z-20 cursor-pointer'
                 onClick={e => {
                     if (e.currentTarget.querySelector('#selector').style.display === 'none') {
                         e.currentTarget.querySelector('#selector').style.display = 'block'
@@ -276,7 +276,7 @@ function PhoneNumberInput() {
                 }}>
                 <div className='flex items-center gap-2 px-2'>
                     <img id='showSelectedFlag' width='40' height='35' src={codes[selectedCountry].flag} />
-                    <input value={codes[selectedCountry].code} type='button' onClick={() => {}} />
+                    <div>{codes[selectedCountry].code}</div>
                     <input type='hidden' name='country_code' value={codes[selectedCountry].code} />
                     <svg width='7' height='5' viewBox='0 0 7 5' fill='none' xmlns='http://www.w3.org/2000/svg'>
                         <path
@@ -308,12 +308,12 @@ function CountrySelect() {
     const countries = ['India', 'USA', 'UK', 'China', 'Australia']
 
     return (
-        <div className='relative'>
+        <div className='relative text-[#696F79]'>
             <label>
                 Country of residence
                 <input type='hidden' name='country' value={selectedCountry} />
                 <input
-                    className='border border-[#8692A6] rounded-md h-12 w-full text-start pl-4 mt-2 mb-2 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                    className='border border-[#8692A6] text-[#494949] rounded-md h-12 w-full text-start pl-4 mt-2 mb-2 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8] cursor-pointer'
                     type='button'
                     value={selectedCountry}
                     onClick={e => {
@@ -323,7 +323,7 @@ function CountrySelect() {
                         } else e.currentTarget.nextElementSibling.style.display = 'block'
                     }}
                 />
-                <ul id='selector' className='hidden absolute z-50 bg-white border rounded w-full'>
+                <ul id='selector' className='hidden absolute z-50 bg-white border rounded w-full cursor-pointer'>
                     {countries.map(country => (
                         <li
                             className='border-b pl-4 py-1 text-lg hover:bg-stone-100'
@@ -361,7 +361,7 @@ function InputEmail({ warning, setEmailWarning }) {
                     type='email'
                     name='email'
                     onFocus={() => setEmailWarning(false)}
-                    className='border border-[#8692A6] rounded-md h-12 w-full pl-4 mt-2 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                    className='border border-[#8692A6] text-[#494949] rounded-md h-12 w-full pl-4 mt-2 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
                 />
                 {warning && <p className='text-red-500'>Email Address already used</p>}
             </label>
