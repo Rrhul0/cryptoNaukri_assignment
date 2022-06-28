@@ -1,89 +1,9 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 function Signup() {
-    const [step, setStep] = useState(0)
     const [data, setData] = useState({})
     const navigate = useNavigate()
-    const stepName = ['', 'Personal Info.', 'Residency Info.', 'Bank Verification']
-
-    const apiHost = import.meta.env.VITE_API_HOST || 'http://localhost:5000' //will change when it get deployed
-    const signupApiEndpoint = `${apiHost}/signup`
-
-    function onClickIndividual(e) {
-        e.preventDefault()
-        setStep(1)
-    }
-
-    function onSubmitPage(e) {
-        e.preventDefault()
-        console.log(data)
-        const stepData = new FormData(e.target)
-        if (step === 1) {
-            const username = stepData.get('username')
-            const email = stepData.get('email')
-            const password = stepData.get('password')
-            //check everything is filled
-            if (!username || !email || !password) {
-                return
-            }
-            //check for terms
-            if (stepData.get('terms') !== 'on') {
-                //add warning here for accept terms
-                return
-            }
-            setData({
-                username: username,
-                email: email,
-                password: password,
-            })
-        } else if (step === 2) {
-            const phone_number = stepData.get('phone_number')
-            const address = stepData.get('address')
-            const country = stepData.get('country')
-            if (!phone_number || !address || !country) {
-                return
-            }
-            setData(oldData => {
-                return {
-                    ...oldData,
-                    phone_number: phone_number,
-                    address: address,
-                    country: country,
-                }
-            })
-        } else if (step === 3) {
-            const bvn = stepData.get('bvn')
-            if (!bvn) {
-                return
-            }
-            setData(oldData => {
-                return { ...oldData, bvn: bvn }
-            })
-        }
-        if (step < 3) setStep(step => step + 1)
-        else if (step === 3) {
-            //send data to server and redirect to success page
-            console.log(JSON.stringify(data))
-            fetch(signupApiEndpoint, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: { 'Content-Type': 'application/json' },
-            })
-                .then(res => {
-                    if (res.status === 200) {
-                        navigate('/signupsuccess', { state: { username: data.username } })
-                    } else console.log('error not 200 status')
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-        }
-    }
-
-    function onClickBack() {
-        setStep(step => step - 1)
-    }
 
     return (
         <div className='flex h-screen'>
@@ -301,325 +221,121 @@ function Signup() {
                     />
                 </svg>
             </div>
-            {!step ? (
-                <div id='step1' className='h-full flex-1'>
-                    <div className='w-fit ml-auto mr-12 mt-10 text-[#8692A6]'>
-                        Already have an account?
-                        <Link className='ml-2 text-[#1565D8] hover:text-blue-400 cursor-pointer ' to='/signin'>
-                            Sign In
-                        </Link>
-                    </div>
-                    <div className='w-1/2 ml-24 mt-20'>
-                        <div className='font-extrabold text-xl leading-10'>Join Us!</div>
-                        <div className='text-[#8692A6] w-3/4 text-sm'>
-                            To begin this journey, tell us what type of account you’d be opening.
-                        </div>
-                        <div
-                            className='blockSelect flex items-center gap-6 mt-8 px-6 py-4  border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow cursor-pointer'
-                            onClick={onClickIndividual}>
-                            <div className='relative'>
-                                <svg
-                                    width='50'
-                                    height='48'
-                                    viewBox='0 0 50 48'
-                                    fill='none'
-                                    xmlns='http://www.w3.org/2000/svg'>
-                                    <path
-                                        className='svgToFill'
-                                        d='M25 0L49.7275 17.9656L40.2824 47.0344H9.71758L0.272532 17.9656L25 0Z'
-                                        stroke='#1565D8'
-                                        strokeWidth='1.4'
-                                    />
-                                </svg>
-                                <svg
-                                    className='absolute top-[calc(25px-10px)] left-[calc(24px-9px)] z-10'
-                                    width='20'
-                                    height='20'
-                                    viewBox='0 0 20 20'
-                                    fill='none'
-                                    xmlns='http://www.w3.org/2000/svg'>
-                                    <path
-                                        fillRule='evenodd'
-                                        clipRule='evenodd'
-                                        d='M3.72039 12.8871C4.50179 12.1057 5.5616 11.6667 6.66667 11.6667H13.3333C14.4384 11.6667 15.4982 12.1057 16.2796 12.8871C17.061 13.6685 17.5 14.7283 17.5 15.8333V17.5C17.5 17.9602 17.1269 18.3333 16.6667 18.3333C16.2064 18.3333 15.8333 17.9602 15.8333 17.5V15.8333C15.8333 15.1703 15.5699 14.5344 15.1011 14.0656C14.6323 13.5967 13.9964 13.3333 13.3333 13.3333H6.66667C6.00363 13.3333 5.36774 13.5967 4.8989 14.0656C4.43006 14.5344 4.16667 15.1703 4.16667 15.8333V17.5C4.16667 17.9602 3.79357 18.3333 3.33333 18.3333C2.8731 18.3333 2.5 17.9602 2.5 17.5V15.8333C2.5 14.7283 2.93899 13.6685 3.72039 12.8871Z'
-                                        fill='white'
-                                    />
-                                    <path
-                                        fillRule='evenodd'
-                                        clipRule='evenodd'
-                                        d='M9.99992 3.33333C8.61921 3.33333 7.49992 4.45262 7.49992 5.83333C7.49992 7.21404 8.61921 8.33333 9.99992 8.33333C11.3806 8.33333 12.4999 7.21404 12.4999 5.83333C12.4999 4.45262 11.3806 3.33333 9.99992 3.33333ZM5.83325 5.83333C5.83325 3.53214 7.69873 1.66666 9.99992 1.66666C12.3011 1.66666 14.1666 3.53214 14.1666 5.83333C14.1666 8.13452 12.3011 10 9.99992 10C7.69873 10 5.83325 8.13452 5.83325 5.83333Z'
-                                        fill='white'
-                                    />
-                                </svg>
-                            </div>
-                            <div>
-                                <div className='font-bold'>Individual</div>
-                                <div className='text-sm text-[#8692A6]'>
-                                    Personal account to manage all you activities.
-                                </div>
-                            </div>
-                            <svg
-                                width='14'
-                                height='14'
-                                viewBox='0 0 14 14'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'>
-                                <path
-                                    fillRule='evenodd'
-                                    clipRule='evenodd'
-                                    d='M7.5893 0.577414C7.26386 0.251977 6.73622 0.251977 6.41079 0.577414C6.08535 0.90285 6.08535 1.43049 6.41079 1.75592L10.8215 6.16667H1.16671C0.70647 6.16667 0.333374 6.53977 0.333374 7C0.333374 7.46024 0.70647 7.83334 1.16671 7.83334H10.8215L6.41079 12.2441C6.08535 12.5695 6.08535 13.0972 6.41079 13.4226C6.73622 13.748 7.26386 13.748 7.5893 13.4226L13.4226 7.58926C13.7481 7.26382 13.7481 6.73618 13.4226 6.41075L7.5893 0.577414Z'
-                                    fill='#1565D8'
-                                />
-                            </svg>
-                        </div>
-                        <div className='blockSelect flex items-center gap-6 mt-8 px-6 py-4 border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow cursor-pointer'>
-                            <div className='relative'>
-                                <svg
-                                    width='50'
-                                    height='48'
-                                    viewBox='0 0 50 48'
-                                    fill='none'
-                                    xmlns='http://www.w3.org/2000/svg'>
-                                    <path
-                                        d='M1.09543 18.2329L25 0.865247L48.9046 18.2329L39.7738 46.3344H10.2262L1.09543 18.2329Z'
-                                        stroke='#1565D8'
-                                        strokeWidth='1.4'
-                                    />
-                                </svg>
-                                <svg
-                                    className='absolute top-[calc(25px-10px)] left-[calc(24px-9px)]'
-                                    width='20'
-                                    height='20'
-                                    viewBox='0 0 20 20'
-                                    fill='none'
-                                    xmlns='http://www.w3.org/2000/svg'>
-                                    <path
-                                        fillRule='evenodd'
-                                        clipRule='evenodd'
-                                        d='M3.33325 6.66667C2.87301 6.66667 2.49992 7.03976 2.49992 7.5V15.8333C2.49992 16.2936 2.87301 16.6667 3.33325 16.6667H16.6666C17.1268 16.6667 17.4999 16.2936 17.4999 15.8333V7.5C17.4999 7.03976 17.1268 6.66667 16.6666 6.66667H3.33325ZM0.833252 7.5C0.833252 6.11929 1.95254 5 3.33325 5H16.6666C18.0473 5 19.1666 6.11929 19.1666 7.5V15.8333C19.1666 17.214 18.0473 18.3333 16.6666 18.3333H3.33325C1.95254 18.3333 0.833252 17.214 0.833252 15.8333V7.5Z'
-                                        fill='#1565D8'
-                                    />
-                                    <path
-                                        fillRule='evenodd'
-                                        clipRule='evenodd'
-                                        d='M6.56549 2.3989C7.03433 1.93006 7.67021 1.66667 8.33325 1.66667H11.6666C12.3296 1.66667 12.9655 1.93006 13.4344 2.3989C13.9032 2.86774 14.1666 3.50363 14.1666 4.16667V17.5C14.1666 17.9602 13.7935 18.3333 13.3333 18.3333C12.873 18.3333 12.4999 17.9602 12.4999 17.5V4.16667C12.4999 3.94565 12.4121 3.73369 12.2558 3.57741C12.0996 3.42113 11.8876 3.33333 11.6666 3.33333H8.33325C8.11224 3.33333 7.90028 3.42113 7.744 3.57741C7.58772 3.73369 7.49992 3.94565 7.49992 4.16667V17.5C7.49992 17.9602 7.12682 18.3333 6.66658 18.3333C6.20635 18.3333 5.83325 17.9602 5.83325 17.5V4.16667C5.83325 3.50363 6.09664 2.86774 6.56549 2.3989Z'
-                                        fill='#1565D8'
-                                    />
-                                </svg>
-                            </div>
-                            <div>
-                                <div className='font-bold'>Business</div>
-                                <div className='text-sm text-[#8692A6]'>
-                                    Own or belong to a company, this is for you.
-                                </div>
-                            </div>
-                            <svg
-                                width='14'
-                                height='14'
-                                viewBox='0 0 14 14'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'>
-                                <path
-                                    fillRule='evenodd'
-                                    clipRule='evenodd'
-                                    d='M7.5893 0.577414C7.26386 0.251977 6.73622 0.251977 6.41079 0.577414C6.08535 0.90285 6.08535 1.43049 6.41079 1.75592L10.8215 6.16667H1.16671C0.70647 6.16667 0.333374 6.53977 0.333374 7C0.333374 7.46024 0.70647 7.83334 1.16671 7.83334H10.8215L6.41079 12.2441C6.08535 12.5695 6.08535 13.0972 6.41079 13.4226C6.73622 13.748 7.26386 13.748 7.5893 13.4226L13.4226 7.58926C13.7481 7.26382 13.7481 6.73618 13.4226 6.41075L7.5893 0.577414Z'
-                                    fill='#1565D8'
-                                />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className='h-full flex-1'>
-                    <div className='flex justify-between items-start mr-12 mt-10 text-[#8692A6] px-14'>
-                        <div
-                            className='back flex items-center gap-3 hover:text-stone-600 cursor-pointer'
-                            onClick={onClickBack}>
-                            <svg
-                                width='8'
-                                height='16'
-                                viewBox='0 0 8 16'
-                                fill='none'
-                                xmlns='http://www.w3.org/2000/svg'>
-                                <path
-                                    d='M9.86251 2.225L8.37918 0.75L0.137512 9L8.38751 17.25L9.86251 15.775L3.08751 9L9.86251 2.225Z'
-                                    className='fill-[#8692A6]'
-                                />
-                            </svg>
-                            Back
-                        </div>
-                        <div className='text-end text-sm'>
-                            <div className='text-[#BDBDBD] text-xs'>STEP 0{step}/03</div>
-                            <div>{stepName[step]}</div>
-                        </div>
-                    </div>
-                    {step === 1 ? (
-                        <div className='w-1/2 ml-24 mt-8'>
-                            <div>
-                                <div className='font-extrabold text-2xl leading-10'>Register Individual Account!</div>
-                                <div className='text-[#8692A6] text-sm'>
-                                    For the purpose of industry regulation, your details are required.
-                                </div>
-                                <form className='mt-6' onSubmit={onSubmitPage}>
-                                    <Input
-                                        name={'username'}
-                                        placeholder='Enter Username'
-                                        type='text'
-                                        heading='Your fullname*'
-                                    />
-                                    <Input
-                                        name='email'
-                                        placeholder='Enter email address'
-                                        type='text'
-                                        heading='Email address*'
-                                    />
-                                    <Input
-                                        name='password'
-                                        placeholder='Enter password'
-                                        type='password'
-                                        heading='Create password*'
-                                    />
-                                    <div className='mt-4 text-[#696F79]'>
-                                        <label>
-                                            <input type='checkbox' className='mr-2 ' name='terms' />I agree to terms &
-                                            conditions
-                                        </label>
-                                    </div>
-                                    <button className='bg-[#1565D8] text-white rounded-md w-full py-3 mt-4'>
-                                        Register Account
-                                    </button>
-                                </form>
-                                <div className='flex items-center'>
-                                    <div className='w-1/2 h-[1px] bg-[#F5F5F5]'></div>
-                                    <div>Or</div>
-                                    <div className='w-1/2 h-[1px] bg-[#F5F5F5]'></div>
-                                </div>
-                                <button className='flex border border-gray-100 rounded-md w-full pl-4 gap-24 py-3 drop-shadow-sm'>
-                                    <svg
-                                        width='24'
-                                        height='24'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        xmlns='http://www.w3.org/2000/svg'>
-                                        <path
-                                            d='M21.8055 10.0415H21V10H12V14H17.6515C16.827 16.3285 14.6115 18 12 18C8.6865 18 6 15.3135 6 12C6 8.6865 8.6865 6 12 6C13.5295 6 14.921 6.577 15.9805 7.5195L18.809 4.691C17.023 3.0265 14.634 2 12 2C6.4775 2 2 6.4775 2 12C2 17.5225 6.4775 22 12 22C17.5225 22 22 17.5225 22 12C22 11.3295 21.931 10.675 21.8055 10.0415Z'
-                                            fill='#FFC107'
-                                        />
-                                        <path
-                                            d='M3.15302 7.3455L6.43851 9.755C7.32752 7.554 9.48052 6 12 6C13.5295 6 14.921 6.577 15.9805 7.5195L18.809 4.691C17.023 3.0265 14.634 2 12 2C8.15902 2 4.82802 4.1685 3.15302 7.3455Z'
-                                            fill='#FF3D00'
-                                        />
-                                        <path
-                                            d='M12 22C14.583 22 16.93 21.0115 18.7045 19.404L15.6095 16.785C14.5717 17.5742 13.3037 18.0011 12 18C9.39897 18 7.19047 16.3415 6.35847 14.027L3.09747 16.5395C4.75247 19.778 8.11347 22 12 22Z'
-                                            fill='#4CAF50'
-                                        />
-                                        <path
-                                            d='M21.8055 10.0415H21V10H12V14H17.6515C17.2571 15.1082 16.5467 16.0766 15.608 16.7855L15.6095 16.7845L18.7045 19.4035C18.4855 19.6025 22 17 22 12C22 11.3295 21.931 10.675 21.8055 10.0415Z'
-                                            fill='#1976D2'
-                                        />
-                                    </svg>
-                                    <div>Register with Google</div>
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className='w-1/2 ml-24 mt-8'>
-                            <div className='font-extrabold text-2xl leading-10'>Complete Your Profile!</div>
-                            <div className='text-[#8692A6] text-sm'>
-                                For the purpose of industry regulation, your details are required.
-                            </div>
-                            <form className='mt-6' onSubmit={onSubmitPage}>
-                                {step === 2 && (
-                                    <div>
-                                        <Input
-                                            name='phone_number'
-                                            placeholder='Please enter phone number'
-                                            type='text'
-                                            heading='Phone number'
-                                        />
-                                        <Input
-                                            name='address'
-                                            placeholder='Please enter address'
-                                            type='text'
-                                            heading='Your address'
-                                        />
-                                        <Input
-                                            name='country'
-                                            placeholder='Please select'
-                                            type='text'
-                                            heading='Country of residence'
-                                        />
-                                    </div>
-                                )}
-                                {step === 3 && (
-                                    <div>
-                                        <Input
-                                            name='bvn'
-                                            placeholder='Please enter Bank verification number'
-                                            type='text'
-                                            heading='Bank verification number (BVN)'
-                                        />
-                                    </div>
-                                )}
-                                <button className='bg-[#1565D8] text-white rounded-md w-full py-3 mt-12'>
-                                    Save & Continue
-                                </button>
-                            </form>
-                            <div className='flex justify-center items-center gap-2 mt-6'>
-                                <svg
-                                    width='10'
-                                    height='14'
-                                    viewBox='0 0 10 14'
-                                    fill='none'
-                                    xmlns='http://www.w3.org/2000/svg'>
-                                    <path
-                                        fillRule='evenodd'
-                                        clipRule='evenodd'
-                                        d='M7.91665 4.95833H8.49998C9.14165 4.95833 9.66665 5.48333 9.66665 6.125V11.9583C9.66665 12.6 9.14165 13.125 8.49998 13.125H1.49998C0.858313 13.125 0.333313 12.6 0.333313 11.9583V6.125C0.333313 5.48333 0.858313 4.95833 1.49998 4.95833H2.08331V3.79167C2.08331 2.18167 3.38998 0.875 4.99998 0.875C6.60998 0.875 7.91665 2.18167 7.91665 3.79167V4.95833ZM4.99998 2.04167C4.03165 2.04167 3.24998 2.82333 3.24998 3.79167V4.95833H6.74998V3.79167C6.74998 2.82333 5.96831 2.04167 4.99998 2.04167ZM1.49998 11.9583V6.125H8.49998V11.9583H1.49998ZM6.16665 9.04167C6.16665 9.68333 5.64165 10.2083 4.99998 10.2083C4.35831 10.2083 3.83331 9.68333 3.83331 9.04167C3.83331 8.4 4.35831 7.875 4.99998 7.875C5.64165 7.875 6.16665 8.4 6.16665 9.04167Z'
-                                        fill='#8692A6'
-                                    />
-                                </svg>
-                                <p className='text-xs text-[#8692A6]'>Your Info is safely secured</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
+            <div className='h-full flex-1'>
+                <Outlet />
+            </div>
         </div>
     )
 }
-
-function Input({ name, placeholder, type, heading }) {
+export function IndexSignup() {
     return (
-        <div>
-            {/* <div className='text-[#696F79] mb-2 mt-3'>{heading}</div> */}
-            <label className='text-[#696F79] relative'>
-                {heading}
-
-                <input
-                    placeholder={placeholder}
-                    required
-                    type={type}
-                    name={name}
-                    className='border border-[#8692A6] rounded-md h-12 w-full pl-4 mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
-                />
-                {type === 'password' && (
-                    <div
-                        className='absolute -bottom-1 right-3 text-black hover:text-stone-700'
-                        onClick={e => {
-                            if (e.currentTarget.previousSibling.type === 'password') {
-                                e.currentTarget.previousSibling.type = 'text'
-                                e.currentTarget.textContent = 'Hide'
-                            } else {
-                                e.currentTarget.previousSibling.type = 'password'
-                                e.currentTarget.textContent = 'Show'
-                            }
-                        }}>
-                        Show
+        <>
+            <div className='w-fit ml-auto mr-12 mt-10 text-[#8692A6]'>
+                Already have an account?
+                <Link className='ml-2 text-[#1565D8] hover:text-blue-400 cursor-pointer ' to='/signin'>
+                    Sign In
+                </Link>
+            </div>
+            <div className='w-1/2 ml-24 mt-20'>
+                <div className='font-extrabold text-xl leading-10'>Join Us!</div>
+                <div className='text-[#8692A6] w-3/4 text-sm'>
+                    To begin this journey, tell us what type of account you’d be opening.
+                </div>
+                <Link
+                    to='individual'
+                    className='blockSelect flex items-center gap-6 mt-8 px-6 py-4  border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow cursor-pointer'
+                    /*onClick={onClickIndividual}*/
+                >
+                    <div className='relative'>
+                        <svg width='50' height='48' viewBox='0 0 50 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                            <path
+                                className='svgToFill'
+                                d='M25 0L49.7275 17.9656L40.2824 47.0344H9.71758L0.272532 17.9656L25 0Z'
+                                stroke='#1565D8'
+                                strokeWidth='1.4'
+                            />
+                        </svg>
+                        <svg
+                            className='absolute top-[calc(25px-10px)] left-[calc(24px-9px)] z-10'
+                            width='20'
+                            height='20'
+                            viewBox='0 0 20 20'
+                            fill='none'
+                            xmlns='http://www.w3.org/2000/svg'>
+                            <path
+                                fillRule='evenodd'
+                                clipRule='evenodd'
+                                d='M3.72039 12.8871C4.50179 12.1057 5.5616 11.6667 6.66667 11.6667H13.3333C14.4384 11.6667 15.4982 12.1057 16.2796 12.8871C17.061 13.6685 17.5 14.7283 17.5 15.8333V17.5C17.5 17.9602 17.1269 18.3333 16.6667 18.3333C16.2064 18.3333 15.8333 17.9602 15.8333 17.5V15.8333C15.8333 15.1703 15.5699 14.5344 15.1011 14.0656C14.6323 13.5967 13.9964 13.3333 13.3333 13.3333H6.66667C6.00363 13.3333 5.36774 13.5967 4.8989 14.0656C4.43006 14.5344 4.16667 15.1703 4.16667 15.8333V17.5C4.16667 17.9602 3.79357 18.3333 3.33333 18.3333C2.8731 18.3333 2.5 17.9602 2.5 17.5V15.8333C2.5 14.7283 2.93899 13.6685 3.72039 12.8871Z'
+                                fill='white'
+                            />
+                            <path
+                                fillRule='evenodd'
+                                clipRule='evenodd'
+                                d='M9.99992 3.33333C8.61921 3.33333 7.49992 4.45262 7.49992 5.83333C7.49992 7.21404 8.61921 8.33333 9.99992 8.33333C11.3806 8.33333 12.4999 7.21404 12.4999 5.83333C12.4999 4.45262 11.3806 3.33333 9.99992 3.33333ZM5.83325 5.83333C5.83325 3.53214 7.69873 1.66666 9.99992 1.66666C12.3011 1.66666 14.1666 3.53214 14.1666 5.83333C14.1666 8.13452 12.3011 10 9.99992 10C7.69873 10 5.83325 8.13452 5.83325 5.83333Z'
+                                fill='white'
+                            />
+                        </svg>
                     </div>
-                )}
-            </label>
-        </div>
+                    <div>
+                        <div className='font-bold'>Individual</div>
+                        <div className='text-sm text-[#8692A6]'>Personal account to manage all you activities.</div>
+                    </div>
+                    <svg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                        <path
+                            fillRule='evenodd'
+                            clipRule='evenodd'
+                            d='M7.5893 0.577414C7.26386 0.251977 6.73622 0.251977 6.41079 0.577414C6.08535 0.90285 6.08535 1.43049 6.41079 1.75592L10.8215 6.16667H1.16671C0.70647 6.16667 0.333374 6.53977 0.333374 7C0.333374 7.46024 0.70647 7.83334 1.16671 7.83334H10.8215L6.41079 12.2441C6.08535 12.5695 6.08535 13.0972 6.41079 13.4226C6.73622 13.748 7.26386 13.748 7.5893 13.4226L13.4226 7.58926C13.7481 7.26382 13.7481 6.73618 13.4226 6.41075L7.5893 0.577414Z'
+                            fill='#1565D8'
+                        />
+                    </svg>
+                </Link>
+                <Link
+                    to='business'
+                    className='blockSelect flex items-center gap-6 mt-8 px-6 py-4 border-2 border-transparent hover:border-[#1565D8] rounded-md shadow-lg drop-shadow cursor-pointer'>
+                    <div className='relative'>
+                        <svg width='50' height='48' viewBox='0 0 50 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                            <path
+                                d='M1.09543 18.2329L25 0.865247L48.9046 18.2329L39.7738 46.3344H10.2262L1.09543 18.2329Z'
+                                stroke='#1565D8'
+                                strokeWidth='1.4'
+                            />
+                        </svg>
+                        <svg
+                            className='absolute top-[calc(25px-10px)] left-[calc(24px-9px)]'
+                            width='20'
+                            height='20'
+                            viewBox='0 0 20 20'
+                            fill='none'
+                            xmlns='http://www.w3.org/2000/svg'>
+                            <path
+                                fillRule='evenodd'
+                                clipRule='evenodd'
+                                d='M3.33325 6.66667C2.87301 6.66667 2.49992 7.03976 2.49992 7.5V15.8333C2.49992 16.2936 2.87301 16.6667 3.33325 16.6667H16.6666C17.1268 16.6667 17.4999 16.2936 17.4999 15.8333V7.5C17.4999 7.03976 17.1268 6.66667 16.6666 6.66667H3.33325ZM0.833252 7.5C0.833252 6.11929 1.95254 5 3.33325 5H16.6666C18.0473 5 19.1666 6.11929 19.1666 7.5V15.8333C19.1666 17.214 18.0473 18.3333 16.6666 18.3333H3.33325C1.95254 18.3333 0.833252 17.214 0.833252 15.8333V7.5Z'
+                                fill='#1565D8'
+                            />
+                            <path
+                                fillRule='evenodd'
+                                clipRule='evenodd'
+                                d='M6.56549 2.3989C7.03433 1.93006 7.67021 1.66667 8.33325 1.66667H11.6666C12.3296 1.66667 12.9655 1.93006 13.4344 2.3989C13.9032 2.86774 14.1666 3.50363 14.1666 4.16667V17.5C14.1666 17.9602 13.7935 18.3333 13.3333 18.3333C12.873 18.3333 12.4999 17.9602 12.4999 17.5V4.16667C12.4999 3.94565 12.4121 3.73369 12.2558 3.57741C12.0996 3.42113 11.8876 3.33333 11.6666 3.33333H8.33325C8.11224 3.33333 7.90028 3.42113 7.744 3.57741C7.58772 3.73369 7.49992 3.94565 7.49992 4.16667V17.5C7.49992 17.9602 7.12682 18.3333 6.66658 18.3333C6.20635 18.3333 5.83325 17.9602 5.83325 17.5V4.16667C5.83325 3.50363 6.09664 2.86774 6.56549 2.3989Z'
+                                fill='#1565D8'
+                            />
+                        </svg>
+                    </div>
+                    <div>
+                        <div className='font-bold'>Business</div>
+                        <div className='text-sm text-[#8692A6]'>Own or belong to a company, this is for you.</div>
+                    </div>
+                    <svg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                        <path
+                            fillRule='evenodd'
+                            clipRule='evenodd'
+                            d='M7.5893 0.577414C7.26386 0.251977 6.73622 0.251977 6.41079 0.577414C6.08535 0.90285 6.08535 1.43049 6.41079 1.75592L10.8215 6.16667H1.16671C0.70647 6.16667 0.333374 6.53977 0.333374 7C0.333374 7.46024 0.70647 7.83334 1.16671 7.83334H10.8215L6.41079 12.2441C6.08535 12.5695 6.08535 13.0972 6.41079 13.4226C6.73622 13.748 7.26386 13.748 7.5893 13.4226L13.4226 7.58926C13.7481 7.26382 13.7481 6.73618 13.4226 6.41075L7.5893 0.577414Z'
+                            fill='#1565D8'
+                        />
+                    </svg>
+                </Link>
+            </div>
+        </>
     )
 }
 

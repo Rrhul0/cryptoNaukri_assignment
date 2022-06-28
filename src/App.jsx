@@ -1,14 +1,35 @@
-import { Link, Route, Routes, useLocation } from 'react-router-dom'
-import Signup from './signup'
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import Signup, { IndexSignup } from './signup'
 import './index.css'
+import SignupIndividual from './signupIndividual'
+import { useEffect } from 'react'
+import SignupBusiness from './signupBusiness'
 
 export default function App() {
     return (
         <Routes>
             <Route path='signupsuccess' element={<SignupSuccess />} />
             <Route path='signin' element={<Signin />} />
-            <Route path='*' element={<Signup />} />
+            <Route path='signup' element={<Signup />}>
+                <Route index element={<IndexSignup />} />
+                <Route path='individual' element={<SignupIndividual />} />
+                <Route path='business' element={<SignupBusiness />} />
+            </Route>
+            <Route path='*' element={<WildCardPage />} />
         </Routes>
+    )
+}
+
+function WildCardPage() {
+    const navigate = useNavigate()
+    useEffect(() => {
+        setTimeout(() => navigate('/signup', { replace: true }), 2000)
+    }, [])
+    return (
+        <div className='flex h-screen justify-center items-center flex-col'>
+            <h1>This is WildCard Page (Not Implemented)</h1>
+            <h2>Redirecting to SignUp Page (main)</h2>
+        </div>
     )
 }
 
