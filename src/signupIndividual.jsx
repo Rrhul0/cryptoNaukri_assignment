@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 export default function SignupIndividual() {
     const [step, setStep] = useState(1)
     const [data, setData] = useState({ user_type: 'individual' })
+    const [emailWarning, setEmailWarning] = useState(false)
     const navigate = useNavigate()
 
     const stepName = ['Personal Info.', 'Residency Info.', 'Bank Verification']
@@ -17,6 +18,7 @@ export default function SignupIndividual() {
 
     const apiHost = import.meta.env.VITE_API_HOST || 'http://localhost:5000' //will change when it get deployed
     const signupApiEndpoint = `${apiHost}/signup`
+    const checkEmailApiEndpoint = `${apiHost}/check-email`
 
     function onSubmitPage(e) {
         e.preventDefault()
@@ -28,20 +30,30 @@ export default function SignupIndividual() {
             //check everything is filled
             if (!username || !email || !password) return
 
-            //check for terms
-            if (stepData.get('terms') !== 'on') {
-                //add warning here for accept terms
-                return
+            if (email) {
+                fetch(checkEmailApiEndpoint, {
+                    method: 'POST',
+                    body: JSON.stringify({ email }),
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                    .then(res => {
+                        if (res.status === 200) {
+                            if (stepData.get('terms') !== 'on') {
+                                //check for terms
+                                //add warning here for accept terms
+                                return
+                            }
+                            setData(oldData => ({ ...oldData, username, email, password }))
+                            setStep(step => step + 1)
+                        } else {
+                            setEmailWarning(true)
+                            return
+                        }
+                    })
+                    .catch(() => {
+                        return
+                    })
             }
-            setData(oldData => {
-                return {
-                    ...oldData,
-                    username: username,
-                    email: email,
-                    password: password,
-                }
-            })
-            setStep(step => step + 1)
         } else if (step === 2) {
             const phone_number = stepData.get('phone_number')
             const country_code = stepData.get('country_code')
@@ -49,22 +61,12 @@ export default function SignupIndividual() {
             const country = stepData.get('country')
             console.log(country)
             if (!phone_number || !address || !country || !country_code) return
-            setData(oldData => {
-                return {
-                    ...oldData,
-                    country_code: country_code,
-                    phone_number: phone_number,
-                    address: address,
-                    country: country,
-                }
-            })
+            setData(oldData => ({ ...oldData, phone_number, country_code, address, country }))
             setStep(step => step + 1)
         } else if (step === 3) {
             const bvn = stepData.get('bvn')
             if (!bvn) return
-            setData(oldData => {
-                return { ...oldData, bvn: bvn }
-            })
+            setData(oldData => ({ ...oldData, bvn }))
             //send data to server and redirect to success page
             fetch(signupApiEndpoint, {
                 method: 'POST',
@@ -107,18 +109,8 @@ export default function SignupIndividual() {
                             For the purpose of industry regulation, your details are required.
                         </div>
                         <form className='mt-6' onSubmit={onSubmitPage}>
-                            <Input
-                                name={'username'}
-                                placeholder='Enter Username'
-                                type='text'
-                                heading='Your fullname*'
-                            />
-                            <Input
-                                name='email'
-                                placeholder='Enter email address'
-                                type='text'
-                                heading='Email address*'
-                            />
+                            <Input name='username' placeholder='Enter Username' type='text' heading='Your fullname*' />
+                            <InputEmail warning={emailWarning} setEmailWarning={setEmailWarning} />
                             <Input
                                 name='password'
                                 placeholder='Enter password'
@@ -221,7 +213,6 @@ export default function SignupIndividual() {
 function Input({ name, placeholder, type, heading }) {
     return (
         <div>
-            {/* <div className='text-[#696F79] mb-2 mt-3'>{heading}</div> */}
             <label className='text-[#696F79] relative'>
                 {heading}
 
@@ -354,6 +345,25 @@ function CountrySelect() {
                         fill='black'
                     />
                 </svg>
+            </label>
+        </div>
+    )
+}
+
+function InputEmail({ warning, setEmailWarning }) {
+    return (
+        <div className='mb-2'>
+            <label className='text-[#696F79] relative'>
+                Email Address*
+                <input
+                    placeholder='Enter Email address'
+                    required
+                    type='email'
+                    name='email'
+                    onFocus={() => setEmailWarning(false)}
+                    className='border border-[#8692A6] rounded-md h-12 w-full pl-4 mt-2 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                />
+                {warning && <p className='text-red-500'>Email Address already used</p>}
             </label>
         </div>
     )
