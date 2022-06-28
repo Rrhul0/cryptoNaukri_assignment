@@ -44,12 +44,15 @@ export default function SignupIndividual() {
             setStep(step => step + 1)
         } else if (step === 2) {
             const phone_number = stepData.get('phone_number')
+            const country_code = stepData.get('country_code')
             const address = stepData.get('address')
             const country = stepData.get('country')
-            if (!phone_number || !address || !country) return
+            console.log(country)
+            if (!phone_number || !address || !country || !country_code) return
             setData(oldData => {
                 return {
                     ...oldData,
+                    country_code: country_code,
                     phone_number: phone_number,
                     address: address,
                     country: country,
@@ -174,24 +177,14 @@ export default function SignupIndividual() {
                     <form className='mt-6' onSubmit={onSubmitPage}>
                         {step === 2 && (
                             <div>
-                                <Input
-                                    name='phone_number'
-                                    placeholder='Please enter phone number'
-                                    type='text'
-                                    heading='Phone number'
-                                />
+                                <PhoneNumberInput />
                                 <Input
                                     name='address'
                                     placeholder='Please enter address'
                                     type='text'
                                     heading='Your address'
                                 />
-                                <Input
-                                    name='country'
-                                    placeholder='Please select'
-                                    type='text'
-                                    heading='Country of residence'
-                                />
+                                <CountrySelect />
                             </div>
                         )}
                         {step === 3 && (
@@ -254,6 +247,113 @@ function Input({ name, placeholder, type, heading }) {
                         Show
                     </div>
                 )}
+            </label>
+        </div>
+    )
+}
+
+function PhoneNumberInput() {
+    const [selectedCountry, setSelectedCountry] = useState('india')
+    const codes = {
+        india: { code: '+91', flag: '/india.png' },
+        usa: { code: '+1', flag: '/usa.png' },
+        uk: { code: '+44', flag: '/uk.png' },
+        china: { code: '+86', flag: '/china.png' },
+        australia: { code: '+61', flag: '/australia.png' },
+    }
+
+    return (
+        <div className='relative'>
+            <label>
+                Phone number
+                <input
+                    className='border border-[#8692A6] rounded-md h-12 w-full pl-[6.5rem] mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                    type='text'
+                    name='phone_number'
+                    // value={value}
+                    placeholder='Enter Phone Number'
+                    // onChange={() => {}}
+                    // onKeyDown={() => {}}
+                />
+            </label>
+            <div
+                className='absolute top-[39%] left-0 w-fit z-20'
+                onClick={e => {
+                    if (e.currentTarget.querySelector('#selector').style.display === 'none') {
+                        e.currentTarget.querySelector('#selector').style.display = 'block'
+                    } else e.currentTarget.querySelector('#selector').style.display = 'none'
+                }}>
+                <div className='flex items-center gap-2 px-2'>
+                    <img id='showSelectedFlag' width='40' height='35' src={codes[selectedCountry].flag} />
+                    <input value={codes[selectedCountry].code} type='button' onClick={() => {}} />
+                    <input type='hidden' name='country_code' value={codes[selectedCountry].code} />
+                    <svg width='7' height='5' viewBox='0 0 7 5' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                        <path
+                            d='M3.1937 4.25224L0.117307 0.834025C-0.0564437 0.640969 0.0805642 0.333336 0.340296 0.333336H6.49308C6.75281 0.333336 6.88982 0.640968 6.71607 0.834025L3.63967 4.25224C3.5205 4.38465 3.31287 4.38465 3.1937 4.25224Z'
+                            fill='black'
+                        />
+                    </svg>
+                </div>
+
+                <ul id='selector' className='hidden bg-white border rounded my-2 '>
+                    {Object.keys(codes).map(country => (
+                        <li
+                            key={codes[country].code}
+                            className='flex items-center gap-2 border-b px-2 hover:bg-stone-100'
+                            onClick={e => setSelectedCountry(e.currentTarget.querySelector('p').textContent)}>
+                            <img width='40' height='35' src={codes[country].flag} />
+                            <p className='hidden'>{country}</p>
+                            {codes[country].code}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    )
+}
+
+function CountrySelect() {
+    const [selectedCountry, setSelectedCountry] = useState('India')
+    const countries = ['India', 'USA', 'UK', 'China', 'Australia']
+
+    return (
+        <div className='relative'>
+            <label>
+                Country of residence
+                <input type='hidden' name='country' value={selectedCountry} />
+                <input
+                    className='border border-[#8692A6] rounded-md h-12 w-full text-start pl-4 mt-2 mb-2 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                    type='button'
+                    value={selectedCountry}
+                    onClick={e => {
+                        console.log(e.currentTarget.nextElementSibling.style.display)
+                        if (e.currentTarget.nextElementSibling.style.display === 'block') {
+                            e.currentTarget.nextElementSibling.style.display = 'none'
+                        } else e.currentTarget.nextElementSibling.style.display = 'block'
+                    }}
+                />
+                <ul id='selector' className='hidden absolute z-50 bg-white border rounded w-full'>
+                    {countries.map(country => (
+                        <li
+                            className='border-b pl-4 py-1 text-lg hover:bg-stone-100'
+                            key={country}
+                            onClick={e => setSelectedCountry(e.currentTarget.textContent)}>
+                            {country}
+                        </li>
+                    ))}
+                </ul>
+                <svg
+                    className='absolute right-4 bottom-7'
+                    width='7'
+                    height='5'
+                    viewBox='0 0 7 5'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'>
+                    <path
+                        d='M3.1937 4.25224L0.117307 0.834025C-0.0564437 0.640969 0.0805642 0.333336 0.340296 0.333336H6.49308C6.75281 0.333336 6.88982 0.640968 6.71607 0.834025L3.63967 4.25224C3.5205 4.38465 3.31287 4.38465 3.1937 4.25224Z'
+                        fill='black'
+                    />
+                </svg>
             </label>
         </div>
     )
