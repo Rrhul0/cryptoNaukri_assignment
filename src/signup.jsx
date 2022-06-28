@@ -7,7 +7,7 @@ function Signup() {
     const navigate = useNavigate()
     const stepName = ['', 'Personal Info.', 'Residency Info.', 'Bank Verification']
 
-    const apiHost = import.meta.env.API_HOST || 'http://localhost:5000' //will change when it get deployed
+    const apiHost = import.meta.env.VITE_API_HOST || 'http://localhost:5000' //will change when it get deployed
     const signupApiEndpoint = `${apiHost}/signup`
 
     function onClickIndividual(e) {
