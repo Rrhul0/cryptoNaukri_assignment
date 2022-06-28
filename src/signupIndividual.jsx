@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Loading from './components/loading'
 
 export default function SignupIndividual() {
     const [step, setStep] = useState(1)
@@ -7,6 +8,7 @@ export default function SignupIndividual() {
     const [emailWarning, setEmailWarning] = useState(false)
     const [passwordWarning, setPasswordWarning] = useState(false)
     const [termsWarning, setTermsWarning] = useState(false)
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
     const stepName = ['Personal Info.', 'Residency Info.', 'Bank Verification']
@@ -50,12 +52,14 @@ export default function SignupIndividual() {
                 return
             }
             if (email) {
+                setLoading(true)
                 fetch(checkEmailApiEndpoint, {
                     method: 'POST',
                     body: JSON.stringify({ email }),
                     headers: { 'Content-Type': 'application/json' },
                 })
                     .then(res => {
+                        setLoading(false)
                         if (res.status === 200) {
                             setData(oldData => ({ ...oldData, username, email, password }))
                             setStep(step => step + 1)
@@ -82,12 +86,14 @@ export default function SignupIndividual() {
             if (!bvn) return
             setData(oldData => ({ ...oldData, bvn }))
             //send data to server and redirect to success page
+            setLoading(true)
             fetch(signupApiEndpoint, {
                 method: 'POST',
                 body: JSON.stringify(data),
                 headers: { 'Content-Type': 'application/json' },
             })
                 .then(res => {
+                    setLoading(false)
                     if (res.status === 200) {
                         navigate('/signupsuccess', { state: { username: data.username } })
                     } else console.log('error not 200 status')
@@ -141,7 +147,7 @@ export default function SignupIndividual() {
                                 </label>
                             </div>
                             <button className='bg-[#1565D8] text-white rounded-md w-full py-3 mt-4'>
-                                Register Account
+                                {loading ? <Loading /> : 'Register Account'}
                             </button>
                         </form>
                         <div className='flex items-center'>
@@ -207,7 +213,7 @@ export default function SignupIndividual() {
                             </div>
                         )}
                         <button className='bg-[#1565D8] text-white rounded-md w-full py-3 mt-12'>
-                            Save & Continue
+                            {loading ? <Loading /> : 'Save & Continue'}
                         </button>
                     </form>
                     <div className='flex justify-center items-center gap-2 mt-6'>
