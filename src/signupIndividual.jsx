@@ -5,6 +5,8 @@ export default function SignupIndividual() {
     const [step, setStep] = useState(1)
     const [data, setData] = useState({ user_type: 'individual' })
     const [emailWarning, setEmailWarning] = useState(false)
+    const [passwordWarning, setPasswordWarning] = useState(false)
+    const [termsWarning, setTermsWarning] = useState(false)
     const navigate = useNavigate()
 
     const stepName = ['Personal Info.', 'Residency Info.', 'Bank Verification']
@@ -30,6 +32,23 @@ export default function SignupIndividual() {
             //check everything is filled
             if (!username || !email || !password) return
 
+            if (password) {
+                //check for password when submit
+                const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
+                //regex for 1 latter 1 number and 1 special character
+                //if above regex is not satisfied, return
+                if (!passwordRegex.test(password)) {
+                    setPasswordWarning(true)
+                    return
+                }
+            }
+
+            if (stepData.get('terms') !== 'on') {
+                //check for terms
+                //add warning here for accept terms
+                setTermsWarning(true)
+                return
+            }
             if (email) {
                 fetch(checkEmailApiEndpoint, {
                     method: 'POST',
@@ -38,11 +57,6 @@ export default function SignupIndividual() {
                 })
                     .then(res => {
                         if (res.status === 200) {
-                            if (stepData.get('terms') !== 'on') {
-                                //check for terms
-                                //add warning here for accept terms
-                                return
-                            }
                             setData(oldData => ({ ...oldData, username, email, password }))
                             setStep(step => step + 1)
                         } else {
@@ -110,17 +124,20 @@ export default function SignupIndividual() {
                         </div>
                         <form className='mt-6' onSubmit={onSubmitPage}>
                             <Input name='username' placeholder='Enter Username' type='text' heading='Your fullname*' />
-                            <InputEmail warning={emailWarning} setEmailWarning={setEmailWarning} />
-                            <Input
-                                name='password'
-                                placeholder='Enter password'
-                                type='password'
-                                heading='Create password*'
-                            />
+                            <InputEmail warning={emailWarning} setWarning={setEmailWarning} />
+                            <InputPassword warning={passwordWarning} setWarning={setPasswordWarning} />
                             <div className=' text-[#696F79]'>
                                 <label>
-                                    <input type='checkbox' className='mr-2 ' name='terms' />I agree to terms &
-                                    conditions
+                                    <input
+                                        type='checkbox'
+                                        className='mr-2 '
+                                        name='terms'
+                                        onFocus={() => setTermsWarning(false)}
+                                    />
+                                    I agree to terms & conditions
+                                    {termsWarning && (
+                                        <p className='text-red-500'>Please accept Terms and Conditions for continue</p>
+                                    )}
                                 </label>
                             </div>
                             <button className='bg-[#1565D8] text-white rounded-md w-full py-3 mt-4'>
@@ -212,31 +229,48 @@ export default function SignupIndividual() {
 
 function Input({ name, placeholder, type, heading }) {
     return (
-        <div>
-            <label className='text-[#696F79] relative'>
-                {heading}
+        <label className='text-[#696F79]'>
+            {heading}
 
+            <input
+                placeholder={placeholder}
+                required
+                type={type}
+                name={name}
+                className='border border-[#8692A6] rounded-md text-[#494949] h-12 w-full pl-4 mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+            />
+        </label>
+    )
+}
+
+function InputPassword({ warning, setWarning }) {
+    return (
+        <div className='mb-2'>
+            <label className='text-[#696F79] relative'>
+                Create password*
                 <input
-                    placeholder={placeholder}
+                    placeholder='Please enter password'
                     required
-                    type={type}
-                    name={name}
-                    className='border border-[#8692A6] rounded-md text-[#494949] h-12 w-full pl-4 mt-2 mb-3 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                    type='password'
+                    name='password'
+                    className='border border-[#8692A6] rounded-md text-[#494949] h-12 w-full pl-4 mt-2 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
+                    onFocus={() => setWarning(false)}
                 />
-                {type === 'password' && (
-                    <div
-                        className='absolute -bottom-1 right-3 text-black hover:text-stone-700'
-                        onClick={e => {
-                            if (e.currentTarget.previousSibling.type === 'password') {
-                                e.currentTarget.previousSibling.type = 'text'
-                                e.currentTarget.textContent = 'Hide'
-                            } else {
-                                e.currentTarget.previousSibling.type = 'password'
-                                e.currentTarget.textContent = 'Show'
-                            }
-                        }}>
-                        Show
-                    </div>
+                <div
+                    className='absolute top-10 right-3 text-black hover:text-stone-700'
+                    onClick={e => {
+                        if (e.currentTarget.previousSibling.type === 'password') {
+                            e.currentTarget.previousSibling.type = 'text'
+                            e.currentTarget.textContent = 'Hide'
+                        } else {
+                            e.currentTarget.previousSibling.type = 'password'
+                            e.currentTarget.textContent = 'Show'
+                        }
+                    }}>
+                    Show
+                </div>
+                {warning && (
+                    <div className='text-red-500'>Password MUST contain 1 Latter, 1 Digit and 1 Speciel Charactor</div>
                 )}
             </label>
         </div>
@@ -350,7 +384,7 @@ function CountrySelect() {
     )
 }
 
-function InputEmail({ warning, setEmailWarning }) {
+function InputEmail({ warning, setWarning }) {
     return (
         <div className='mb-2'>
             <label className='text-[#696F79] relative'>
@@ -360,7 +394,7 @@ function InputEmail({ warning, setEmailWarning }) {
                     required
                     type='email'
                     name='email'
-                    onFocus={() => setEmailWarning(false)}
+                    onFocus={() => setWarning(false)}
                     className='border border-[#8692A6] text-[#494949] rounded-md h-12 w-full pl-4 mt-2 placeholder:text-[#8692A6] outline-none focus-within:drop-shadow focus-within:border-[#1565D8]'
                 />
                 {warning && <p className='text-red-500'>Email Address already used</p>}
